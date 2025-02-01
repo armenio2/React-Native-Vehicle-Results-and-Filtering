@@ -1,74 +1,80 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, Text, TouchableOpacity, Image, TextInput, Switch, StyleSheet } from 'react-native';
+import vehicleData from '../../vehicles.json';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+type Vehicle = {
+  id: number;
+  Make: string;
+  Model: string;
+  "Engine Size": string;
+  "Fuel Type": string;
+  Year: number;
+  Mileage: number;
+  "Auction Date and Time": string;
+  "Starting Bid": number;
+  favourite: boolean;
+};  
 
-export default function HomeScreen() {
+const App: React.FC = () => {
+  const [vehicles, setVehicles] = useState<Vehicle[]>(vehicleData);
+  const [filterMake, setFilterMake] = useState<string>('');
+  const [filterModel, setFilterModel] = useState<string>('');
+  const [filterBidMin, setFilterBidMin] = useState<string>('');
+  const [filterBidMax, setFilterBidMax] = useState<string>('');
+  const [showFavourites, setShowFavourites] = useState<boolean>(false);
+
+  const toggleFavourite = (id: number) => {
+    setVehicles((prevVehicles) =>
+      prevVehicles.map((vehicle) =>
+        vehicle.id === id ? { ...vehicle, favourite: !vehicle.favourite } : vehicle
+      )
+    );
+  };
+
+  const filteredVehicles = vehicles.filter((vehicle) => {
+    return (
+      (filterMake === '' || vehicle.Make.toLowerCase().includes(filterMake.toLowerCase())) &&
+      (filterModel === '' || vehicle.Model.toLowerCase().includes(filterModel.toLowerCase())) &&
+      (filterBidMin === '' || vehicle['Starting Bid'] >= parseFloat(filterBidMin)) &&
+      (filterBidMax === '' || vehicle['Starting Bid'] <= parseFloat(filterBidMax)) &&
+      (!showFavourites || vehicle.favourite)
+    );
+  });
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={{ padding: 20, marginTop: 35 }}>
+      <TextInput placeholder="Make" value={filterMake} onChangeText={setFilterMake} style={styles.input} />
+      <TextInput placeholder="Model" value={filterModel} onChangeText={setFilterModel} style={styles.input} />
+      <TextInput placeholder="Min Bid" keyboardType="numeric" value={filterBidMin} onChangeText={setFilterBidMin} style={styles.input} />
+      <TextInput placeholder="Max Bid" keyboardType="numeric" value={filterBidMax} onChangeText={setFilterBidMax} style={styles.input} />
+      <View style={styles.switchContainer}>
+        <Text>Show Favourites</Text>
+        <Switch value={showFavourites} onValueChange={setShowFavourites} />
+      </View>
+      <FlatList
+        data={filteredVehicles}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => toggleFavourite(item.id)} style={styles.item}>
+            <Image source={{ uri: 'https://via.placeholder.com/150' }} style={styles.image} />
+            <View>
+              <Text>{item.Make} {item.Model} ({item.Year})</Text>
+              <Text>Starting Bid: ${item['Starting Bid']}</Text>
+              <Text>Fuel: {item['Fuel Type']}</Text>
+              <Text>{item.favourite ? '❤️' : '🤍'}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  input: { padding: 10, borderWidth: 1, marginBottom: 10 },
+  item: { flexDirection: 'row', padding: 10, borderBottomWidth: 1 },
+  image: { width: 50, height: 50, marginRight: 10 },
+  switchContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 }
 });
+
+export default App;
