@@ -1,0 +1,27 @@
+[
+    {
+      "id": 1,
+      "Make": "Toyota",
+      "Model": "Corolla",
+      "Engine Size": "1.8L",
+      "Fuel Type": "Gasoline",
+      "Year": 2020,
+      "Mileage": 30000,
+      "Auction Date and Time": "2025-03-15T14:00:00Z",
+      "Starting Bid": 15000,
+      "favourite": false
+    },
+    {
+      "id": 2,
+      "Make": "Honda",
+      "Model": "Civic",
+      "Engine Size": "2.0L",
+      "Fuel Type": "Gasoline",
+      "Year": 2019,
+      "Mileage": 25000,
+      "Auction Date and Time": "2025-03-18T10:00:00Z",
+      "Starting Bid": 14000,
+      "favourite": true
+    }
+  ]
+  
