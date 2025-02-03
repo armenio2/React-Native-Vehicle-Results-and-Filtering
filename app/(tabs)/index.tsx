@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, FlatList, Text, TouchableOpacity, Image, TextInput, Switch, StyleSheet } from 'react-native';
 import vehicleData from '../../vehicles.json';
+import PlaceholderIcon from '../../assets/images/placeholder.svg';
 
 type Vehicle = {
   id: number;
@@ -13,6 +14,7 @@ type Vehicle = {
   "Auction Date and Time": string;
   "Starting Bid": number;
   favourite: boolean;
+  imageUrl?: string;
 };  
 
 const App: React.FC = () => {
@@ -56,7 +58,11 @@ const App: React.FC = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => toggleFavourite(item.id)} style={styles.item}>
-            <Image source={{ uri: 'https://via.placeholder.com/150' }} style={styles.image} />
+            {item.imageUrl ? (
+              <Image source={{ uri: item.imageUrl }} style={styles.image} />
+            ) : (
+              <PlaceholderIcon width={50} height={50} />
+            )}
             <View>
               <Text>{item.Make} {item.Model} ({item.Year})</Text>
               <Text>Starting Bid: ${item['Starting Bid']}</Text>
@@ -72,8 +78,8 @@ const App: React.FC = () => {
 
 const styles = StyleSheet.create({
   input: { padding: 10, borderWidth: 1, marginBottom: 10 },
-  item: { flexDirection: 'row', padding: 10, borderBottomWidth: 1 },
-  image: { width: 50, height: 50, marginRight: 10 },
+  item: { flexDirection: 'row', alignItems: 'center', padding: 10, borderBottomWidth: 1 },
+  image: { width: 50, height: 50, marginRight: 10, borderRadius: 5 },
   switchContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 }
 });
 
